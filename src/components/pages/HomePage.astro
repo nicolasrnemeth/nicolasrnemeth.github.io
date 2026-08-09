@@ -1,0 +1,53 @@
+---
+import type { Locale } from '@/config/site';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/sections/Hero.astro';
+import About from '@/components/sections/About.astro';
+import Experience from '@/components/sections/Experience.astro';
+import FeaturedProjects from '@/components/sections/FeaturedProjects.astro';
+import Education from '@/components/sections/Education.astro';
+import Contact from '@/components/sections/Contact.astro';
+import { localePath, absoluteUrl } from '@/i18n/routing';
+import { personSchema, websiteSchema, profilePageSchema } from '@/lib/schema';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const path = localePath('', locale);
+const url = absoluteUrl(path);
+
+const meta = {
+  en: {
+    title: 'Nicolas R. Nemeth | Software Engineer for AI & Cloud, Vienna',
+    description:
+      'Senior Software Engineer in Vienna working on AI, cloud and full-stack systems, from the first concept through to production. MSc Computational Science.',
+  },
+  de: {
+    title: 'Nicolas R. Nemeth | Software Engineer für AI & Cloud, Wien',
+    description:
+      'Senior Software Engineer in Wien, tätig an AI-, Cloud- und Full-Stack-Systemen, vom ersten Konzept bis in den Betrieb. MSc Computational Science.',
+  },
+}[locale];
+
+const schema = [personSchema(locale), websiteSchema(locale), profilePageSchema(locale, url)];
+---
+
+<BaseLayout
+  title={meta.title}
+  description={meta.description}
+  locale={locale}
+  route={{ kind: 'home' }}
+  path={path}
+  ogType="profile"
+  schema={schema}
+  flush
+>
+  <Hero locale={locale} />
+  <About locale={locale} />
+  <Experience locale={locale} />
+  <FeaturedProjects locale={locale} />
+  <Education locale={locale} />
+  <Contact locale={locale} />
+</BaseLayout>

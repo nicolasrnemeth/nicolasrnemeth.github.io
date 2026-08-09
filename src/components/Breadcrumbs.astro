@@ -1,0 +1,75 @@
+---
+/**
+ * Visible breadcrumbs. The matching BreadcrumbList JSON-LD is emitted by each
+ * page. Google wants both the markup and the structured data to agree.
+ */
+interface Props {
+  items: { name: string; url: string; current?: boolean }[];
+}
+
+const { items } = Astro.props;
+---
+
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  <ol>
+    {
+      items.map((item, index) => (
+        <li>
+          {item.current ? (
+            <span aria-current="page">{item.name}</span>
+          ) : (
+            <a href={new URL(item.url).pathname || '/'}>{item.name}</a>
+          )}
+          {index < items.length - 1 && (
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <path d="m6.5 3.5 4 4.5-4 4.5" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .breadcrumbs {
+    padding-block: var(--space-s);
+  }
+
+  .breadcrumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  .breadcrumbs li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .breadcrumbs a {
+    color: var(--muted);
+    transition: color var(--dur) var(--ease-out);
+  }
+
+  .breadcrumbs a:hover {
+    color: var(--accent);
+  }
+
+  .breadcrumbs [aria-current='page'] {
+    color: var(--text-2);
+  }
+
+  .breadcrumbs svg {
+    inline-size: 0.85rem;
+    block-size: 0.85rem;
+    color: var(--faint);
+  }
+</style>

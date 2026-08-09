@@ -1,0 +1,99 @@
+---
+import type { Locale } from '@/config/site';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ProjectCard from '@/components/ProjectCard.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import { useTranslations } from '@/i18n/ui';
+import { localePath, absoluteUrl } from '@/i18n/routing';
+import { sortedProjects } from '@/data/cv';
+import {
+  collectionPageSchema,
+  breadcrumbSchema,
+  itemListSchema,
+  allProjectEntries,
+  personSchema,
+} from '@/lib/schema';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const path = localePath('projects', locale);
+const url = absoluteUrl(path);
+
+const crumbs = [
+  { name: t('nav.home'), url: absoluteUrl(localePath('', locale)) },
+  { name: t('projects.metaTitle'), url },
+];
+
+const schema = [
+  personSchema(locale),
+  collectionPageSchema({
+    url,
+    name: t('projects.metaTitle'),
+    description: t('projects.metaDescription'),
+    locale,
+  }),
+  breadcrumbSchema(crumbs),
+  itemListSchema(allProjectEntries(locale, path)),
+];
+---
+
+<BaseLayout
+  title={t('projects.seoTitle')}
+  description={t('projects.metaDescription')}
+  locale={locale}
+  route={{ kind: 'projects' }}
+  path={path}
+  schema={schema}
+>
+  <div class="container">
+    <Breadcrumbs items={crumbs.map((c, i) => ({ ...c, current: i === crumbs.length - 1 }))} />
+
+    <div class="section__head projects-page__head">
+      <p class="eyebrow">{t('projects.title')}</p>
+      <h1 class="section__title">{t('projects.kicker')}</h1>
+      <p class="section__lead">{t('projects.metaDescription')}</p>
+    </div>
+
+    <div class="grid-auto projects-page__grid">
+      {
+        sortedProjects.map((project, index) => (
+          <div data-reveal style={`--reveal-delay:${index * 60}ms`}>
+            <ProjectCard project={project} locale={locale} headingLevel="h2" />
+          </div>
+        ))
+      }
+    </div>
+
+    <p class="projects-page__note">{t('projects.note')}</p>
+  </div>
+</BaseLayout>
+
+<style>
+  .projects-page__head {
+    margin-block: var(--space-l) var(--space-xl);
+  }
+
+  .projects-page__grid {
+    grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr));
+  }
+
+  .projects-page__grid > * {
+    display: flex;
+  }
+
+  .projects-page__grid > * > * {
+    inline-size: 100%;
+  }
+
+  .projects-page__note {
+    margin-block-start: var(--space-xl);
+    max-inline-size: 44rem;
+    font-size: var(--step--1);
+    color: var(--faint);
+    font-style: italic;
+  }
+</style>

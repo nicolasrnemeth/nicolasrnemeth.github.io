@@ -1,0 +1,192 @@
+---
+import { SITE, CONTACT, type Locale } from '@/config/site';
+import { useTranslations } from '@/i18n/ui';
+import { localePath } from '@/i18n/routing';
+import OrbitMark from '@/components/OrbitMark.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const year = new Date().getFullYear();
+const home = localePath('', locale);
+
+const links = [
+  { href: localePath('projects', locale), label: t('nav.projects') },
+  { href: `${home}#contact`, label: t('nav.contact') },
+];
+---
+
+<footer class="site-footer">
+  <div class="container site-footer__inner">
+    <div class="site-footer__brand">
+      <a class="site-footer__mark" href={home}>
+        <OrbitMark size="2.1rem" />
+        <span>{SITE.name}</span>
+      </a>
+      <p class="site-footer__note">{t('contact.location')}</p>
+    </div>
+
+    <nav class="site-footer__nav" aria-label={t('nav.menu')}>
+      <ul>
+        {links.map((link) => <li><a class="site-footer__link" href={link.href}>{link.label}</a></li>)}
+      </ul>
+    </nav>
+
+    <ul class="site-footer__social">
+      <li>
+        <a
+          class="social"
+          href={CONTACT.linkedin}
+          rel="me noopener noreferrer"
+          target="_blank"
+          aria-label="LinkedIn"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+            <path
+              d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm7 0h3.8v1.7h.05A4.17 4.17 0 0 1 17.6 8.7c4.02 0 4.76 2.6 4.76 6V21h-4v-5.5c0-1.31-.02-3-1.85-3-1.86 0-2.14 1.44-2.14 2.9V21h-4V9Z"
+            ></path>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a
+          class="social"
+          href={CONTACT.github}
+          rel="me noopener noreferrer"
+          target="_blank"
+          aria-label="GitHub"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+            <path
+              d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48l-.01-1.7c-2.78.6-3.37-1.34-3.37-1.34-.45-1.16-1.11-1.47-1.11-1.47-.91-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.53 2.34 1.09 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.94 0-1.09.39-1.98 1.03-2.68-.1-.25-.45-1.27.1-2.65 0 0 .84-.27 2.75 1.02a9.5 9.5 0 0 1 5 0c1.91-1.29 2.75-1.02 2.75-1.02.55 1.38.2 2.4.1 2.65.64.7 1.03 1.59 1.03 2.68 0 3.84-2.34 4.68-4.57 4.93.36.31.68.92.68 1.85l-.01 2.75c0 .27.18.58.69.48A10 10 0 0 0 12 2Z"
+            ></path>
+          </svg>
+        </a>
+      </li>
+      <li>
+        <a
+          class="social"
+          href={`mailto:${CONTACT.email}`}
+          aria-label={t('contact.emailLabel')}
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7">
+            <rect x="2.75" y="4.75" width="18.5" height="14.5" rx="2.5"></rect>
+            <path d="m3.5 7.5 8.5 6 8.5-6"></path>
+          </svg>
+        </a>
+      </li>
+    </ul>
+  </div>
+
+  <div class="container site-footer__bottom">
+    <p>&copy; {year} {SITE.name}. {t('footer.rights')}</p>
+    <p class="site-footer__built">{t('footer.built')}</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    position: relative;
+    margin-block-start: var(--space-3xl);
+    padding-block: var(--space-xl) var(--space-l);
+    border-block-start: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .site-footer__inner {
+    display: grid;
+    gap: var(--space-l);
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .site-footer__mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  .site-footer__note {
+    margin-block-start: var(--space-2xs);
+    max-inline-size: 26rem;
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  .site-footer__nav ul,
+  .site-footer__social {
+    display: flex;
+    gap: var(--space-m);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .site-footer__nav ul {
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  .site-footer__link {
+    font-size: var(--step--1);
+    color: var(--text-2);
+    transition: color var(--dur) var(--ease-out);
+  }
+
+  .site-footer__link:hover {
+    color: var(--accent);
+  }
+
+  .social {
+    display: inline-grid;
+    place-items: center;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    color: var(--text-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-full);
+    transition:
+      color var(--dur) var(--ease-out),
+      border-color var(--dur) var(--ease-out),
+      background-color var(--dur) var(--ease-out);
+  }
+
+  .social svg {
+    inline-size: 1.15rem;
+    block-size: 1.15rem;
+  }
+
+  .social:hover {
+    color: var(--text);
+    border-color: var(--border-strong);
+  }
+
+  .site-footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--space-2xs) var(--space-m);
+    margin-block-start: var(--space-xl);
+    padding-block-start: var(--space-s);
+    border-block-start: 1px solid var(--border);
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  @media (min-width: 48rem) {
+    .site-footer__inner {
+      grid-template-columns: 2fr 1fr auto;
+      gap: var(--space-xl);
+    }
+
+    .site-footer__social {
+      justify-content: flex-end;
+    }
+  }
+</style>

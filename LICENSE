@@ -1,0 +1,23 @@
+Copyright (c) 2026 Nicolas R. Nemeth. All rights reserved.
+
+This repository contains the source code, design and written content of the
+personal website published at https://nicolasrnemeth.github.io/.
+
+No permission is granted to copy, modify, distribute, publish, sublicense or
+otherwise use any part of this repository, in source or compiled form, without
+the prior written permission of the copyright holder. Making the repository
+publicly readable, as GitHub Pages requires, does not grant any such permission.
+
+Viewing the source and forking the repository through GitHub's own interface,
+as permitted by the GitHub Terms of Service, is not restricted by this notice.
+
+Third-party dependencies listed in `package.json`, and the Inter font shipped in
+`public/fonts/`, remain under their own respective licences and are not covered
+by this notice.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHOR BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

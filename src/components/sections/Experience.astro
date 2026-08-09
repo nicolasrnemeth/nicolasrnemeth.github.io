@@ -1,0 +1,277 @@
+---
+import type { Locale } from '@/config/site';
+import { useTranslations } from '@/i18n/ui';
+import { positions } from '@/data/cv';
+import { formatMonth, isoRange } from '@/lib/format';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+
+const work = positions.filter((p) => p.kind === 'work');
+const research = positions.filter((p) => p.kind === 'research');
+
+const range = (start: string, end: string | null) =>
+  `${formatMonth(start, locale)} ${t('range.to')} ${end ? formatMonth(end, locale) : t('experience.present')}`;
+---
+
+<section class="section" id="experience" aria-labelledby="experience-title">
+  <div class="container">
+    <div class="section__head" data-reveal>
+      <p class="eyebrow">{t('experience.title')}</p>
+      <h2 class="section__title" id="experience-title">{t('experience.kicker')}</h2>
+    </div>
+
+    <ol class="timeline">
+      {
+        work.map((position, index) => (
+          <li class="timeline__item" data-reveal style={`--reveal-delay:${index * 80}ms`}>
+            <div class="timeline__marker" aria-hidden="true">
+              <span class="timeline__dot" />
+            </div>
+
+            <article class="timeline__body">
+              <header class="timeline__header">
+                <h3 class="timeline__role">{position.title[locale]}</h3>
+                <p class="timeline__org">{position.org}</p>
+                <p class="timeline__meta">
+                  <time class="mono" datetime={isoRange(position.start, position.end)}>
+                    {range(position.start, position.end)}
+                  </time>
+                  <span class="timeline__sep" aria-hidden="true">
+                    ·
+                  </span>
+                  <span>{position.location[locale]}</span>
+                </p>
+              </header>
+
+              <p class="timeline__summary">{position.summary[locale]}</p>
+
+              {position.highlights[locale].length > 0 && (
+                <ul class="timeline__list">
+                  {position.highlights[locale].map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              )}
+
+              {position.stack && (
+                <ul class="tag-list timeline__stack">
+                  {position.stack.map((item) => (
+                    <li class="tag">{item}</li>
+                  ))}
+                </ul>
+              )}
+            </article>
+          </li>
+        ))
+      }
+    </ol>
+
+    <div class="research" data-reveal>
+      <h3 class="research__title">{t('experience.research')}</h3>
+      <div class="grid-auto">
+        {
+          research.map((position) => (
+            <article class="card research__card">
+              <p class="research__period mono">
+                <time datetime={isoRange(position.start, position.end)}>
+                  {range(position.start, position.end)}
+                </time>
+              </p>
+              <h4 class="research__role">{position.title[locale]}</h4>
+              <p class="research__org">{position.org}</p>
+              <p class="research__summary">{position.summary[locale]}</p>
+              {position.highlights[locale].length > 0 && (
+                <ul class="research__list">
+                  {position.highlights[locale].map((item) => (
+                    <li>{item}</li>
+                  ))}
+                </ul>
+              )}
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .timeline {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .timeline__item {
+    display: grid;
+    grid-template-columns: 1.5rem 1fr;
+    gap: 0 var(--space-m);
+    padding-block-end: var(--space-2xl);
+  }
+
+  .timeline__item:last-of-type {
+    padding-block-end: var(--space-xl);
+  }
+
+  .timeline__marker {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    padding-block-start: 0.55rem;
+  }
+
+  /* The connecting line */
+  .timeline__marker::before {
+    content: '';
+    position: absolute;
+    inset-block: 1.4rem -2.5rem;
+    inline-size: 1px;
+    background: linear-gradient(180deg, var(--border-strong), transparent);
+  }
+
+  .timeline__item:last-of-type .timeline__marker::before {
+    display: none;
+  }
+
+  .timeline__dot {
+    position: relative;
+    z-index: 1;
+    inline-size: 9px;
+    block-size: 9px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow:
+      0 0 0 4px color-mix(in oklab, var(--accent) 14%, transparent),
+      0 0 14px var(--accent);
+  }
+
+  .timeline__role {
+    font-size: var(--step-1);
+    letter-spacing: -0.025em;
+  }
+
+  .timeline__org {
+    margin-block-start: 0.1rem;
+    font-size: var(--step-0);
+    font-weight: 500;
+    color: var(--accent);
+  }
+
+  .timeline__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    margin-block-start: var(--space-3xs);
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  .timeline__sep {
+    color: var(--faint);
+  }
+
+  .timeline__summary {
+    max-inline-size: 46rem;
+    margin-block-start: var(--space-s);
+    color: var(--text-2);
+    line-height: 1.62;
+  }
+
+  .timeline__list {
+    max-inline-size: 46rem;
+    margin-block-start: var(--space-s);
+    padding-inline-start: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  .timeline__list li {
+    position: relative;
+    padding-inline-start: 1.35rem;
+    color: var(--text-2);
+    line-height: 1.6;
+  }
+
+  .timeline__list li::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 0.72em;
+    inset-inline-start: 0.1rem;
+    inline-size: 0.45rem;
+    block-size: 1px;
+    background: var(--accent);
+  }
+
+  .timeline__stack {
+    margin-block-start: var(--space-m);
+  }
+
+  /* --- Research --- */
+  .research {
+    margin-block-start: var(--space-l);
+    padding-block-start: var(--space-xl);
+    border-block-start: 1px solid var(--border);
+  }
+
+  .research__title {
+    margin-block-end: var(--space-m);
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .research__period {
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  .research__role {
+    margin-block-start: var(--space-2xs);
+    font-size: var(--step-1);
+    letter-spacing: -0.02em;
+  }
+
+  .research__org {
+    margin-block-start: 0.15rem;
+    font-size: var(--step--1);
+    font-weight: 500;
+    color: var(--accent);
+  }
+
+  .research__summary {
+    margin-block-start: var(--space-xs);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .research__list {
+    margin-block-start: var(--space-xs);
+    padding-inline-start: 1.1rem;
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--muted);
+  }
+
+  .research__list li + li {
+    margin-block-start: 0.35rem;
+  }
+
+  @media (min-width: 48rem) {
+    .timeline__item {
+      gap: 0 var(--space-l);
+    }
+  }
+</style>

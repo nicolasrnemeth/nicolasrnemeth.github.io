@@ -1,0 +1,190 @@
+---
+import { SITE, HAS_PORTRAIT, PORTRAIT_SRC, type Locale } from '@/config/site';
+import { useTranslations } from '@/i18n/ui';
+import { localePath } from '@/i18n/routing';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const home = localePath('', locale);
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="container hero__inner">
+    <div class="hero__content">
+      <p class="hero__eyebrow">
+        <span class="hero__dot" aria-hidden="true"></span>
+        {t('hero.eyebrow')}
+      </p>
+
+      <h1 id="hero-title" class="hero__title">
+        <span class="hero__name">{SITE.name}</span>
+        <span class="hero__role">{t('hero.role')}</span>
+      </h1>
+
+      <p class="hero__lead">{t('hero.lead')}</p>
+
+      <div class="hero__actions">
+        <a class="btn btn--primary" href={localePath('projects', locale)}>
+          {t('hero.ctaProjects')}
+          <svg class="btn__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M2.5 8h11M9 3.5 13.5 8 9 12.5" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </a>
+        <a class="btn btn--ghost" href={`${home}#contact`}>
+          {t('hero.ctaContact')}
+        </a>
+      </div>
+
+    </div>
+
+    {
+      HAS_PORTRAIT && (
+        <div class="hero__visual">
+          <img
+            class="hero__portrait"
+            src={PORTRAIT_SRC}
+            alt={t('hero.portraitAlt')}
+            width="400"
+            height="400"
+            fetchpriority="high"
+            decoding="async"
+          />
+        </div>
+      )
+    }
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    padding-block: clamp(2rem, 4.5vw, 3.5rem) 0;
+  }
+
+  .hero__inner {
+    display: grid;
+    gap: clamp(2.5rem, 6vw, 4rem);
+    align-items: center;
+    grid-template-columns: 1fr;
+  }
+
+  .hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: var(--step--1);
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .hero__dot {
+    position: relative;
+    inline-size: 7px;
+    block-size: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  .hero__dot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: hero-ping 2.6s var(--ease-out) infinite;
+  }
+
+  @keyframes hero-ping {
+    0% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    70%,
+    100% {
+      transform: scale(3.4);
+      opacity: 0;
+    }
+  }
+
+  .hero__title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-block-start: var(--space-s);
+  }
+
+  .hero__name {
+    font-size: var(--step-5);
+    font-weight: 640;
+    letter-spacing: -0.042em;
+    line-height: 1;
+    background: linear-gradient(
+      178deg,
+      var(--text) 18%,
+      color-mix(in oklab, var(--text) 62%, var(--bg)) 96%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .hero__role {
+    font-size: var(--step-2);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--accent);
+  }
+
+  .hero__lead {
+    max-inline-size: 34rem;
+    margin-block-start: var(--space-m);
+    font-size: var(--step-1);
+    line-height: 1.65;
+    color: var(--text-2);
+  }
+
+  .hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-s);
+    margin-block-start: var(--space-l);
+  }
+
+  /* --- Portrait, shown once one is configured --- */
+  .hero__visual {
+    display: flex;
+    justify-content: center;
+  }
+
+  /* Capped at 12rem: the source is 400px square, so this stays sharp on
+     2x displays without asking the layout for more room than it needs. */
+  .hero__portrait {
+    inline-size: min(12rem, 44vw);
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    box-shadow:
+      0 0 0 6px color-mix(in oklab, var(--accent) 9%, transparent),
+      0 18px 38px -18px rgb(0 0 0 / 0.45);
+  }
+
+  @media (min-width: 60rem) {
+    .hero__inner:has(.hero__visual) {
+      grid-template-columns: minmax(0, 1fr) auto;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__dot::after {
+      animation: none;
+    }
+  }
+</style>

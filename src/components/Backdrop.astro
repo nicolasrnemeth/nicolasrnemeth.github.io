@@ -1,0 +1,16 @@
+---
+/**
+ * The atmosphere layer: a fixed gradient/grid wash that is always present,
+ * plus a starfield canvas and cursor glow that only come alive on desktop
+ * pointers (see effects.ts and the media queries in global.css).
+ */
+---
+
+<div class="backdrop" aria-hidden="true">
+  <canvas class="backdrop__canvas"></canvas>
+</div>
+<div class="cursor-glow" aria-hidden="true"></div>
+
+<script>
+  import '@/scripts/effects';
+</script>

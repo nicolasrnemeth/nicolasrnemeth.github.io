@@ -1,0 +1,15 @@
+---
+import type { GetStaticPaths } from 'astro';
+import ProjectPage from '@/components/pages/ProjectPage.astro';
+import { projects } from '@/data/cv';
+
+export const getStaticPaths = (() =>
+  projects.map((project) => ({
+    params: { slug: project.slugDe },
+    props: { project },
+  }))) satisfies GetStaticPaths;
+
+const { project } = Astro.props;
+---
+
+<ProjectPage project={project} locale="de" />

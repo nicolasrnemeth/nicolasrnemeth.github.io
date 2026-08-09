@@ -1,0 +1,83 @@
+---
+import type { Locale } from '@/config/site';
+import { useTranslations } from '@/i18n/ui';
+import { localePath } from '@/i18n/routing';
+import { sortedProjects } from '@/data/cv';
+import ProjectCard from '@/components/ProjectCard.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+const featured = sortedProjects.filter((p) => p.featured).slice(0, 3);
+---
+
+<section class="section" id="projects" aria-labelledby="projects-title">
+  <div class="container">
+    <div class="projects__head" data-reveal>
+      <div class="section__head">
+        <p class="eyebrow">{t('projects.title')}</p>
+        <h2 class="section__title" id="projects-title">{t('projects.kicker')}</h2>
+      </div>
+      <a class="btn btn--ghost btn--small projects__all" href={localePath('projects', locale)}>
+        {t('projects.all')}
+        <svg class="btn__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M2.5 8h11M9 3.5 13.5 8 9 12.5" stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </a>
+    </div>
+
+    <div class="grid-auto projects__grid">
+      {
+        featured.map((project, index) => (
+          <div data-reveal style={`--reveal-delay:${index * 70}ms`}>
+            <ProjectCard project={project} locale={locale} />
+          </div>
+        ))
+      }
+    </div>
+
+    <p class="projects__note" data-reveal>{t('projects.note')}</p>
+  </div>
+</section>
+
+<style>
+  .projects__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-m);
+  }
+
+  .projects__head .section__head {
+    margin-block-end: 0;
+  }
+
+  .projects__all {
+    flex: none;
+  }
+
+  .projects__grid {
+    margin-block-start: var(--space-xl);
+    grid-template-columns: repeat(auto-fit, minmax(min(22rem, 100%), 1fr));
+  }
+
+  .projects__grid > * {
+    display: flex;
+  }
+
+  .projects__grid > * > * {
+    inline-size: 100%;
+  }
+
+  .projects__note {
+    margin-block-start: var(--space-l);
+    max-inline-size: 44rem;
+    font-size: var(--step--1);
+    color: var(--faint);
+    font-style: italic;
+  }
+</style>

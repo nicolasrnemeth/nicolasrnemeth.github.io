@@ -1,0 +1,150 @@
+---
+import { CONTACT, type Locale } from '@/config/site';
+import { useTranslations } from '@/i18n/ui';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+
+const [emailUser, emailDomain] = CONTACT.email.split('@');
+const linkedinHandle = CONTACT.linkedin.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+---
+
+<section class="section contact" id="contact" aria-labelledby="contact-title">
+  <div class="container">
+    <div class="contact__panel" data-reveal>
+      <div class="contact__intro">
+        <p class="eyebrow">{t('contact.title')}</p>
+        <h2 class="section__title" id="contact-title">{t('contact.kicker')}</h2>
+        <p class="contact__lead">{t('contact.lead')}</p>
+      </div>
+
+      <dl class="contact__channels">
+        <div class="contact__channel">
+          <dt class="contact__label">{t('contact.emailLabel')}</dt>
+          <dd class="contact__value">
+            <!-- Assembled client-side, so the address is not sitting in the
+                 markup as a plain mailto: for scrapers to harvest. -->
+            <a
+              class="contact__link"
+              href="#"
+              data-email-user={emailUser}
+              data-email-domain={emailDomain}
+              rel="nofollow"
+            >
+              <noscript>{emailUser} [at] {emailDomain}</noscript>
+            </a>
+          </dd>
+        </div>
+
+        <div class="contact__channel">
+          <dt class="contact__label">LinkedIn</dt>
+          <dd class="contact__value">
+            <a class="contact__link" href={CONTACT.linkedin} rel="me noopener noreferrer" target="_blank">
+              {linkedinHandle}
+              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+                <path d="M6 3.5h6.5V10M12.5 3.5 4 12" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </a>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact__panel {
+    padding: clamp(1.75rem, 4vw, 3rem);
+    background: linear-gradient(
+      150deg,
+      var(--surface) 0%,
+      color-mix(in oklab, var(--surface-2) 80%, transparent) 100%
+    );
+    border: 1px solid var(--border);
+    border-radius: var(--radius-l);
+  }
+
+  .contact__lead {
+    max-inline-size: 34rem;
+    margin-block-start: var(--space-s);
+    color: var(--text-2);
+    line-height: 1.65;
+  }
+
+  .contact__channels {
+    display: grid;
+    gap: var(--space-m);
+    margin-block-start: var(--space-xl);
+    padding-block-start: var(--space-m);
+    border-block-start: 1px solid var(--border);
+    grid-template-columns: 1fr;
+  }
+
+  .contact__channel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .contact__label {
+    font-family: var(--font-mono);
+    font-size: var(--step--1);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .contact__value {
+    margin: 0;
+  }
+
+  .contact__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: var(--step-1);
+    font-weight: 500;
+    color: var(--accent);
+    word-break: break-word;
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size var(--dur) var(--ease-out);
+  }
+
+  .contact__link:hover,
+  .contact__link:focus-visible {
+    background-size: 100% 1px;
+  }
+
+  .contact__link svg {
+    inline-size: 0.85rem;
+    block-size: 0.85rem;
+    flex: none;
+  }
+
+  @media (min-width: 42rem) {
+    .contact__channels {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-l);
+    }
+  }
+</style>
+
+<script>
+  /* Reassemble the address in the browser rather than shipping it in the HTML. */
+  document.querySelectorAll<HTMLAnchorElement>('[data-email-user]').forEach((link) => {
+    const user = link.dataset.emailUser;
+    const domain = link.dataset.emailDomain;
+    if (!user || !domain) return;
+    const address = `${user}@${domain}`;
+    link.href = `mailto:${address}`;
+    link.textContent = address;
+    link.removeAttribute('rel');
+  });
+</script>

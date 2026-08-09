@@ -1,0 +1,114 @@
+---
+import '@/styles/global.css';
+import { SITE, type Locale } from '@/config/site';
+import { LOCALE_TAGS, type RouteId } from '@/i18n/routing';
+import { useTranslations } from '@/i18n/ui';
+import Seo from '@/components/Seo.astro';
+import Backdrop from '@/components/Backdrop.astro';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  locale: Locale;
+  route: RouteId;
+  path: string;
+  ogType?: 'website' | 'article' | 'profile';
+  image?: string;
+  noindex?: boolean;
+  schema?: object[];
+  publishedTime?: string;
+  modifiedTime?: string;
+  /** Home page uses a wider hero layout with no top padding on <main>. */
+  flush?: boolean;
+}
+
+const {
+  title,
+  description,
+  locale,
+  route,
+  path,
+  ogType,
+  image,
+  noindex,
+  schema = [],
+  publishedTime,
+  modifiedTime,
+  flush = false,
+} = Astro.props;
+
+const t = useTranslations(locale);
+---
+
+<!doctype html>
+<html lang={LOCALE_TAGS[locale]} data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Resolve the stored theme before first paint to avoid a flash. -->
+    <script is:inline>
+      (function () {
+        try {
+          var stored = localStorage.getItem('theme');
+          var prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
+          document.documentElement.dataset.theme = stored || (prefersLight ? 'light' : 'dark');
+        } catch (e) {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      })();
+    </script>
+
+    <link
+      rel="preload"
+      as="font"
+      type="font/woff2"
+      href="/fonts/inter-latin-wght-normal.woff2"
+      crossorigin
+    />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <meta name="theme-color" content="#0a0c0f" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#f2f4f7" media="(prefers-color-scheme: light)" />
+
+
+    <Seo
+      title={title}
+      description={description}
+      locale={locale}
+      route={route}
+      path={path}
+      ogType={ogType}
+      image={image}
+      noindex={noindex}
+      schema={schema}
+      publishedTime={publishedTime}
+      modifiedTime={modifiedTime}
+    />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">{t('nav.skipToContent')}</a>
+    <Backdrop />
+    <Header locale={locale} route={route} />
+    <main id="main" class:list={['site-main', { 'site-main--flush': flush }]}>
+      <slot />
+    </main>
+    <Footer locale={locale} />
+
+    <style>
+      .site-main {
+        position: relative;
+        z-index: 1;
+        padding-block-start: var(--space-2xl);
+      }
+
+      .site-main--flush {
+        padding-block-start: 0;
+      }
+    </style>
+  </body>
+</html>

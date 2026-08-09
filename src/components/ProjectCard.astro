@@ -1,0 +1,138 @@
+---
+import type { Locale } from '@/config/site';
+import { useTranslations } from '@/i18n/ui';
+import { localePath } from '@/i18n/routing';
+import { projectSlug, type Project } from '@/data/cv';
+
+interface Props {
+  project: Project;
+  locale: Locale;
+  /** Heading level so the card fits its surrounding document outline. */
+  headingLevel?: 'h2' | 'h3' | 'h4';
+}
+
+const { project, locale, headingLevel = 'h3' } = Astro.props;
+const t = useTranslations(locale);
+const Heading = headingLevel;
+const href = `${localePath('projects', locale)}${projectSlug(project, locale)}/`;
+
+const categoryLabel = {
+  ai: t('projects.filter.ai'),
+  engineering: t('projects.filter.engineering'),
+  research: t('projects.filter.research'),
+}[project.category];
+---
+
+<article class="card project-card">
+  <div class="project-card__top">
+    <span class="tag tag--accent">{categoryLabel}</span>
+    <span class="project-card__year mono">{project.year}</span>
+  </div>
+
+  <Heading class="project-card__title">
+    <a class="project-card__link" href={href}>
+      <span class="project-card__cover"></span>
+      {project.title[locale]}
+    </a>
+  </Heading>
+
+  <p class="project-card__context">{project.context[locale]}</p>
+  <p class="project-card__tagline">{project.tagline[locale]}</p>
+
+  <ul class="tag-list project-card__stack">
+    {project.stack.slice(0, 4).map((item) => <li class="tag">{item}</li>)}
+    {project.stack.length > 4 && <li class="tag">+{project.stack.length - 4}</li>}
+  </ul>
+
+  <p class="project-card__cta" aria-hidden="true">
+    {t('projects.readMore')}
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+      <path d="M2.5 8h11M9 3.5 13.5 8 9 12.5" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg>
+  </p>
+</article>
+
+<style>
+  .project-card {
+    block-size: 100%;
+  }
+
+  .project-card__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-s);
+    margin-block-end: var(--space-s);
+  }
+
+  .project-card__year {
+    font-size: var(--step--1);
+    color: var(--faint);
+  }
+
+  .project-card__title {
+    font-size: var(--step-1);
+    letter-spacing: -0.026em;
+  }
+
+  /* Stretched link: the whole card is clickable, but only the title is the
+     accessible link target. */
+  .project-card__link {
+    color: var(--text);
+    transition: color var(--dur) var(--ease-out);
+  }
+
+  .project-card__cover {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .project-card:hover .project-card__link,
+  .project-card__link:focus-visible {
+    color: var(--accent);
+  }
+
+  .project-card__context {
+    margin-block-start: var(--space-2xs);
+    font-size: var(--step--1);
+    color: var(--muted);
+  }
+
+  .project-card__tagline {
+    margin-block-start: var(--space-s);
+    color: var(--text-2);
+    line-height: 1.6;
+  }
+
+  .project-card__stack {
+    margin-block-start: var(--space-m);
+  }
+
+  .project-card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-block-start: auto;
+    padding-block-start: var(--space-m);
+    font-size: var(--step--1);
+    font-weight: 550;
+    color: var(--accent);
+    opacity: 0.75;
+    transition: opacity var(--dur) var(--ease-out);
+  }
+
+  .project-card__cta svg {
+    inline-size: 0.9rem;
+    block-size: 0.9rem;
+    transition: transform var(--dur) var(--ease-out);
+  }
+
+  .project-card:hover .project-card__cta {
+    opacity: 1;
+  }
+
+  .project-card:hover .project-card__cta svg {
+    transform: translateX(3px);
+  }
+</style>

@@ -1,0 +1,105 @@
+---
+/**
+ * OrbitMark: the personal symbol, drawn entirely in CSS.
+ *
+ * A small core inside a tilted orbit with a single satellite. Used at icon
+ * scale only, in the header and footer lockups and on the 404 page.
+ *
+ * The tilt is a real 3D `rotateX`, not a `scaleY` squash: the satellite
+ * counter-rotates on both axes so it stays a circle everywhere on the ellipse.
+ *
+ * The satellite orbits continuously, one revolution every nine seconds. It
+ * stops for visitors who ask for reduced motion.
+ */
+interface Props {
+  size?: string;
+  class?: string;
+}
+
+const { size = '1.75rem', class: className = '' } = Astro.props;
+---
+
+<span class:list={['mark', className]} style={`--mark-size:${size}`} aria-hidden="true">
+  <span class="mark__orbit">
+    <span class="mark__ring"></span>
+    <span class="mark__spinner"><span class="mark__satellite"></span></span>
+  </span>
+  <span class="mark__core"></span>
+</span>
+
+<style>
+  .mark {
+    --mark-tilt: 68deg;
+    --mark-sat: calc(var(--mark-size) * 0.13);
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    inline-size: var(--mark-size);
+    block-size: var(--mark-size);
+    flex: none;
+    vertical-align: middle;
+  }
+
+  /* The orbital plane, tilted away from the viewer. */
+  .mark__orbit {
+    position: absolute;
+    inset: 0;
+    transform: rotate(-24deg) rotateX(var(--mark-tilt));
+    transform-style: preserve-3d;
+  }
+
+  .mark__ring {
+    position: absolute;
+    inset: 0;
+    border: 1px solid color-mix(in oklab, var(--accent) 34%, transparent);
+    border-radius: 50%;
+  }
+
+  .mark__spinner {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    animation: mark-orbit 9s linear infinite;
+  }
+
+  .mark__satellite {
+    position: absolute;
+    inset-block-start: calc(var(--mark-sat) / -2);
+    inset-inline-start: 50%;
+    margin-inline-start: calc(var(--mark-sat) / -2);
+    inline-size: var(--mark-sat);
+    block-size: var(--mark-sat);
+    border-radius: 50%;
+    background: var(--accent);
+    /* Cancels the plane's tilt and the spinner's rotation, so the satellite
+       always faces the viewer as a true circle. */
+    transform: rotate(0deg) rotateX(calc(var(--mark-tilt) * -1));
+    animation: mark-orbit-counter 9s linear infinite;
+  }
+
+  .mark__core {
+    inline-size: calc(var(--mark-size) * 0.3);
+    block-size: calc(var(--mark-size) * 0.3);
+    border-radius: 50%;
+    background: var(--text-2);
+  }
+
+  @keyframes mark-orbit {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes mark-orbit-counter {
+    to {
+      transform: rotate(-360deg) rotateX(calc(var(--mark-tilt) * -1));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mark__spinner,
+    .mark__satellite {
+      animation: none !important;
+    }
+  }
+</style>

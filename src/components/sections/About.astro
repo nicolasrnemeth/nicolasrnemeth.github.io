@@ -1,0 +1,116 @@
+---
+import type { Locale } from '@/config/site';
+import { useTranslations } from '@/i18n/ui';
+import { skillGroups } from '@/data/cv';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<section class="section" id="about" aria-labelledby="about-title">
+  <div class="container">
+    <div class="section__head" data-reveal>
+      <p class="eyebrow">{t('about.title')}</p>
+      <h2 class="section__title" id="about-title">{t('about.kicker')}</h2>
+    </div>
+
+    <div class="about">
+      <div class="about__prose" data-reveal>
+        <p class="about__intro">{t('about.p1')}</p>
+        <p>{t('about.p2')}</p>
+        <p>{t('about.p3')}</p>
+        <p>{t('about.p4')}</p>
+      </div>
+
+      <div class="about__skills" data-reveal style="--reveal-delay:90ms">
+        <h3 class="about__skills-title">{t('education.skills')}</h3>
+        <dl class="about__groups">
+          {
+            skillGroups.map((group) => (
+              <div class="about__group">
+                <dt class="about__group-label">{group.label[locale]}</dt>
+                <dd>
+                  <ul class="tag-list">
+                    {group.items.map((item) => (
+                      <li class="tag">{item}</li>
+                    ))}
+                  </ul>
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about {
+    display: grid;
+    gap: clamp(2rem, 5vw, 3.5rem);
+    grid-template-columns: 1fr;
+  }
+
+  .about__prose {
+    max-inline-size: 38rem;
+    color: var(--text-2);
+    font-size: var(--step-0);
+    line-height: 1.7;
+  }
+
+  .about__prose > * + * {
+    margin-block-start: 1.15em;
+  }
+
+  .about__intro {
+    font-size: var(--step-1);
+    line-height: 1.55;
+    color: var(--text);
+    letter-spacing: -0.012em;
+  }
+
+  .about__skills-title {
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-block-end: var(--space-xs);
+    border-block-end: 1px solid var(--border);
+  }
+
+  .about__groups {
+    margin: 0;
+  }
+
+  .about__group {
+    padding-block: var(--space-s);
+    border-block-end: 1px solid var(--border);
+  }
+
+  .about__group:last-child {
+    border-block-end: 0;
+  }
+
+  .about__group-label {
+    margin-block-end: var(--space-2xs);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  .about__group dd {
+    margin: 0;
+  }
+
+  @media (min-width: 62rem) {
+    .about {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    }
+  }
+</style>

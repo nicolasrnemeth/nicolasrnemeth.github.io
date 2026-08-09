@@ -1,0 +1,161 @@
+---
+import type { Locale } from '@/config/site';
+import { useTranslations } from '@/i18n/ui';
+import { education, certifications } from '@/data/cv';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<section class="section" id="education" aria-labelledby="education-title">
+  <div class="container">
+    <div class="section__head" data-reveal>
+      <p class="eyebrow">{t('education.title')}</p>
+      <h2 class="section__title" id="education-title">{t('education.kicker')}</h2>
+    </div>
+
+    <div class="education">
+      <ol class="education__list">
+        {
+          education.map((entry, index) => (
+            <li class="card education__item" data-reveal style={`--reveal-delay:${index * 80}ms`}>
+              <h3 class="education__degree">{entry.field[locale]}</h3>
+              <p class="education__meta">
+                {entry.degree[locale]} · {entry.institution}
+              </p>
+              <ul class="education__detail">
+                {entry.detail[locale].map((line) => (
+                  <li>{line}</li>
+                ))}
+              </ul>
+            </li>
+          ))
+        }
+      </ol>
+
+      <aside class="education__certs" data-reveal style="--reveal-delay:120ms">
+        <h3 class="education__certs-title">{t('education.certifications')}</h3>
+        <ul class="education__certs-list">
+          {
+            certifications.map((cert) => (
+              <li>
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                  <path d="M13.5 4.5 6.5 11.5 3 8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+                <span>{cert.name[locale]}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<style>
+  .education {
+    display: grid;
+    gap: var(--space-l);
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .education__list {
+    display: grid;
+    gap: var(--space-m);
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .education__degree {
+    font-size: var(--step-1);
+    letter-spacing: -0.025em;
+  }
+
+  .education__meta {
+    margin-block-start: 0.15rem;
+    font-size: var(--step--1);
+    font-weight: 500;
+    color: var(--accent);
+  }
+
+  .education__detail {
+    margin-block-start: var(--space-s);
+    padding-inline-start: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  .education__detail li {
+    position: relative;
+    padding-inline-start: 1.35rem;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .education__detail li::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 0.7em;
+    inset-inline-start: 0.1rem;
+    inline-size: 0.45rem;
+    block-size: 1px;
+    background: var(--accent);
+  }
+
+  .education__certs {
+    padding: clamp(1.35rem, 2.5vw, 1.9rem);
+    background: color-mix(in oklab, var(--surface) 60%, transparent);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-l);
+  }
+
+  .education__certs-title {
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .education__certs-list {
+    margin-block-start: var(--space-s);
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+  }
+
+  .education__certs-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    color: var(--text-2);
+  }
+
+  .education__certs-list svg {
+    inline-size: 1rem;
+    block-size: 1rem;
+    flex: none;
+    margin-block-start: 0.2rem;
+    color: var(--accent);
+  }
+
+  @media (min-width: 62rem) {
+    .education {
+      grid-template-columns: minmax(0, 1.35fr) minmax(0, 0.65fr);
+      gap: var(--space-xl);
+    }
+  }
+</style>

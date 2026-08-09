@@ -1,0 +1,279 @@
+---
+import type { Locale } from '@/config/site';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import { useTranslations } from '@/i18n/ui';
+import { localePath, absoluteUrl } from '@/i18n/routing';
+import { projectSlug, sortedProjects, type Project } from '@/data/cv';
+import { projectSchema, breadcrumbSchema, personSchema } from '@/lib/schema';
+
+interface Props {
+  project: Project;
+  locale: Locale;
+}
+
+const { project, locale } = Astro.props;
+const t = useTranslations(locale);
+
+const basePath = localePath('projects', locale);
+const path = `${basePath}${projectSlug(project, locale)}/`;
+const url = absoluteUrl(path);
+
+const crumbs = [
+  { name: t('nav.home'), url: absoluteUrl(localePath('', locale)) },
+  { name: t('projects.metaTitle'), url: absoluteUrl(basePath) },
+  { name: project.title[locale], url },
+];
+
+const schema = [
+  personSchema(locale),
+  projectSchema(project, locale, url),
+  breadcrumbSchema(crumbs),
+];
+
+/** Two other projects to keep visitors moving through the site. */
+const related = sortedProjects.filter((p) => p.slug !== project.slug).slice(0, 2);
+
+const categoryLabel = {
+  ai: t('projects.filter.ai'),
+  engineering: t('projects.filter.engineering'),
+  research: t('projects.filter.research'),
+}[project.category];
+
+/** Meta description: the tagline, trimmed to a search-friendly length. */
+const description =
+  project.tagline[locale].length > 158
+    ? `${project.tagline[locale].slice(0, 155).trimEnd()}…`
+    : project.tagline[locale];
+---
+
+<BaseLayout
+  title={project.title[locale]}
+  description={description}
+  locale={locale}
+  route={{ kind: 'project', slug: project.slug }}
+  path={path}
+  ogType="article"
+  schema={schema}
+>
+  <article class="container container--narrow project">
+    <Breadcrumbs items={crumbs.map((c, i) => ({ ...c, current: i === crumbs.length - 1 }))} />
+
+    <header class="project__header">
+      <div class="project__badges">
+        <span class="tag tag--accent">{categoryLabel}</span>
+        <span class="tag">{project.year}</span>
+      </div>
+
+      <h1 class="project__title">{project.title[locale]}</h1>
+      <p class="project__tagline">{project.tagline[locale]}</p>
+
+      <dl class="project__meta">
+        <div>
+          <dt>{t('projects.context')}</dt>
+          <dd>{project.context[locale]}</dd>
+        </div>
+        <div>
+          <dt>{t('projects.year')}</dt>
+          <dd class="mono">{project.year}</dd>
+        </div>
+      </dl>
+    </header>
+
+    <div class="prose project__body">
+      {project.body[locale].map((paragraph) => <p>{paragraph}</p>)}
+    </div>
+
+    <section class="project__block" aria-labelledby="project-outcomes">
+      <h2 class="project__block-title" id="project-outcomes">{t('projects.outcomes')}</h2>
+      <ul class="project__outcomes">
+        {project.outcomes[locale].map((item) => <li>{item}</li>)}
+      </ul>
+    </section>
+
+    <section class="project__block" aria-labelledby="project-stack">
+      <h2 class="project__block-title" id="project-stack">{t('projects.stack')}</h2>
+      <ul class="tag-list">
+        {project.stack.map((item) => <li class="tag">{item}</li>)}
+      </ul>
+    </section>
+
+    {
+      project.link && (
+        <p class="project__external">
+          <a class="btn btn--ghost btn--small" href={project.link.href} target="_blank" rel="noopener noreferrer">
+            {project.link.label[locale]}
+            <svg class="btn__icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+              <path d="M6 3.5h6.5V10M12.5 3.5 4 12" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </a>
+        </p>
+      )
+    }
+
+    <nav class="project__related" aria-label={t('projects.all')}>
+      <h2 class="project__block-title">{t('projects.all')}</h2>
+      <ul>
+        {
+          related.map((item) => (
+            <li>
+              <a class="project__related-link" href={`${basePath}${projectSlug(item, locale)}/`}>
+                <span class="project__related-title">{item.title[locale]}</span>
+                <span class="project__related-year mono">{item.year}</span>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="project__back">
+        <a class="link" href={basePath}>← {t('projects.back')}</a>
+      </p>
+    </nav>
+  </article>
+</BaseLayout>
+
+<style>
+  .project {
+    padding-block-end: var(--space-2xl);
+  }
+
+  .project__header {
+    padding-block: var(--space-m) var(--space-xl);
+    border-block-end: 1px solid var(--border);
+  }
+
+  .project__badges {
+    display: flex;
+    gap: var(--space-2xs);
+  }
+
+  .project__title {
+    margin-block-start: var(--space-m);
+    font-size: var(--step-3);
+    letter-spacing: -0.03em;
+  }
+
+  .project__tagline {
+    max-inline-size: 38rem;
+    margin-block-start: var(--space-m);
+    font-size: var(--step-1);
+    line-height: 1.55;
+    color: var(--text-2);
+    letter-spacing: -0.01em;
+  }
+
+  .project__meta {
+    display: grid;
+    gap: var(--space-m);
+    margin-block-start: var(--space-xl);
+    grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr));
+  }
+
+  .project__meta dt {
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .project__meta dd {
+    margin: 0;
+    margin-block-start: 0.35rem;
+    font-size: 0.95rem;
+    color: var(--text-2);
+  }
+
+  .project__body {
+    margin-block-start: var(--space-xl);
+    max-inline-size: none;
+  }
+
+  .project__block {
+    margin-block-start: var(--space-2xl);
+  }
+
+  .project__block-title {
+    font-size: var(--step--1);
+    font-weight: 600;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-block-end: var(--space-xs);
+    border-block-end: 1px solid var(--border);
+    margin-block-end: var(--space-m);
+  }
+
+  .project__outcomes {
+    padding-inline-start: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-s);
+  }
+
+  .project__outcomes li {
+    position: relative;
+    padding-inline-start: 1.6rem;
+    color: var(--text-2);
+    line-height: 1.6;
+  }
+
+  .project__outcomes li::before {
+    content: '';
+    position: absolute;
+    inset-block-start: 0.62em;
+    inset-inline-start: 0;
+    inline-size: 0.8rem;
+    block-size: 1px;
+    background: var(--accent);
+  }
+
+  .project__external {
+    margin-block-start: var(--space-xl);
+  }
+
+  .project__related {
+    margin-block-start: var(--space-3xl);
+  }
+
+  .project__related ul {
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .project__related-link {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-m);
+    padding-block: var(--space-s);
+    border-block-end: 1px solid var(--border);
+    color: var(--text-2);
+    transition: color var(--dur) var(--ease-out);
+  }
+
+  .project__related-link:hover {
+    color: var(--accent);
+  }
+
+  .project__related-title {
+    font-size: var(--step-0);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  .project__related-year {
+    flex: none;
+    font-size: var(--step--1);
+    color: var(--faint);
+  }
+
+  .project__back {
+    margin-block-start: var(--space-l);
+    font-size: var(--step--1);
+  }
+</style>
